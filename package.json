@@ -1,0 +1,75 @@
+{
+  "name": "@yallet/elizaos-plugin-aesp",
+  "version": "0.1.0",
+  "description": "Policy-gated agent economics for ElizaOS: 8-check policy engine, human-in-the-loop review, agent-to-agent negotiation, budget tracking",
+  "main": "dist/index.js",
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/",
+    "clean": "rm -rf dist/"
+  },
+  "keywords": [
+    "eliza",
+    "elizaos",
+    "plugin",
+    "agent",
+    "policy",
+    "aesp",
+    "sovereignty",
+    "human-in-the-loop",
+    "negotiation",
+    "budget"
+  ],
+  "author": "Jian Sheng Wang <jason@yeah.app>",
+  "license": "BUSL-1.1",
+  "dependencies": {
+    "@yallet/aesp": "file:../dev.aesp"
+  },
+  "peerDependencies": {
+    "@elizaos/core": ">=0.1.0"
+  },
+  "devDependencies": {
+    "@elizaos/core": "0.1.7",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.0",
+    "vitest": "^3.0.0"
+  },
+  "agentConfig": {
+    "pluginType": "elizaos:plugin:1.0.0",
+    "pluginParameters": {
+      "AESP_OWNER_XIDENTITY": {
+        "type": "string",
+        "description": "Owner xidentity public key for policy signing"
+      },
+      "AESP_DEFAULT_CHAIN": {
+        "type": "string",
+        "description": "Default chain ID (e.g., 'ethereum', 'solana')",
+        "optional": true
+      },
+      "AESP_AGENT_ID": {
+        "type": "string",
+        "description": "Agent identifier for policy lookup"
+      },
+      "AESP_OWNER_USER_ID": {
+        "type": "string",
+        "description": "Authorized operator user ID for sensitive economic actions"
+      },
+      "AESP_ADMIN_USER_IDS": {
+        "type": "string",
+        "description": "Comma-separated additional operator user IDs for sensitive economic actions",
+        "optional": true
+      }
+    }
+  }
+}
