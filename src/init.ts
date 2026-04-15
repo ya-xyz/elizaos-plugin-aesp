@@ -1,5 +1,5 @@
 /**
- * @yallet/elizaos-plugin-aesp — Initialization
+ * @yault/elizaos-plugin-aesp — Initialization
  *
  * Instantiates AESP core components per runtime instance.
  */
@@ -9,7 +9,7 @@ import {
   ReviewManager,
   NegotiationStateMachine,
   CommitmentBuilder,
-} from '@yallet/aesp';
+} from '@yault/aesp';
 import type { IAgentRuntime } from '@elizaos/core';
 import { ElizaStorageAdapter } from './storage.js';
 import type { AESPPluginConfig } from './types.js';
@@ -24,6 +24,7 @@ interface RuntimeContext {
 }
 
 const contexts = new WeakMap<IAgentRuntime, RuntimeContext>();
+const initPromises = new WeakMap<IAgentRuntime, Promise<void>>();
 const MAX_KNOWN_AGENTS = 256;
 const AGENT_ID_PATTERN = /^[a-zA-Z0-9_-]{1,64}$/;
 
@@ -80,7 +81,7 @@ export async function initAESP(runtime: IAgentRuntime): Promise<void> {
   const config: AESPPluginConfig = {
     ownerXidentity: runtime.getSetting('AESP_OWNER_XIDENTITY') ?? '',
     agentId: runtime.getSetting('AESP_AGENT_ID') ?? runtime.agentId,
-    defaultChain: runtime.getSetting('AESP_DEFAULT_CHAIN') ?? 'ethereum',
+    defaultChain: (runtime.getSetting('AESP_DEFAULT_CHAIN') ?? 'ethereum').toLowerCase(),
   };
 
   const policyEngine = new PolicyEngine(storage);
@@ -101,4 +102,27 @@ export async function initAESP(runtime: IAgentRuntime): Promise<void> {
     config,
     knownAgentIds: new Set([config.agentId]),
   });
+}
+
+/**
+ * Ensure the plugin is initialized for the runtime.
+ * Required for ElizaOS versions that do not invoke plugin init hooks.
+ */
+export async function ensureAESPInitialized(runtime: IAgentRuntime): Promise<void> {
+  if (contexts.has(runtime)) return;
+
+  const existing = initPromises.get(runtime);
+  if (existing) {
+    await existing;
+    return;
+  }
+
+  const pending = initAESP(runtime);
+  initPromises.set(runtime, pending);
+
+  try {
+    await pending;
+  } finally {
+    initPromises.delete(runtime);
+  }
 }

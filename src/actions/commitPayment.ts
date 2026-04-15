@@ -5,7 +5,7 @@
  */
 
 import type { Action, IAgentRuntime, Memory, State, HandlerCallback } from '@elizaos/core';
-import { getCommitmentBuilder, getConfig, trackKnownAgent, getReviewManager } from '../init.js';
+import { ensureAESPInitialized, getCommitmentBuilder, getConfig, trackKnownAgent, getReviewManager } from '../init.js';
 import { requireAuthorizedOperator, guardFrozenAgent } from '../security.js';
 
 const CHAIN_ID_MAP: Record<string, number> = {
@@ -53,6 +53,7 @@ export const commitPaymentAction: Action = {
       if (!(await requireAuthorizedOperator(runtime, message, callback))) {
         return;
       }
+      await ensureAESPInitialized(runtime);
 
       const config = getConfig(runtime);
       const builder = getCommitmentBuilder(runtime);

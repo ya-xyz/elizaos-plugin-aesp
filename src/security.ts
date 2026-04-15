@@ -1,5 +1,5 @@
 import type { HandlerCallback, IAgentRuntime, Memory } from '@elizaos/core';
-import type { ReviewManager } from '@yallet/aesp';
+import type { ReviewManager } from '@yault/aesp';
 
 const AUTH_DENY_MESSAGE = 'Unauthorized request. This operation requires an authorized operator.';
 

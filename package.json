@@ -1,10 +1,15 @@
 {
-  "name": "@yallet/elizaos-plugin-aesp",
+  "name": "@yault/elizaos-plugin-aesp",
   "version": "0.1.0",
   "description": "Policy-gated agent economics for ElizaOS: 8-check policy engine, human-in-the-loop review, agent-to-agent negotiation, budget tracking",
   "main": "dist/index.js",
   "type": "module",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -32,12 +37,18 @@
     "budget"
   ],
   "author": "Jian Sheng Wang <jason@yeah.app>",
-  "license": "BUSL-1.1",
-  "dependencies": {
-    "@yallet/aesp": "file:../dev.aesp"
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ya-xyz/elizaos-plugin-aesp.git"
+  },
+  "homepage": "https://yault.xyz",
+  "bugs": {
+    "url": "https://github.com/ya-xyz/elizaos-plugin-aesp/issues"
   },
   "peerDependencies": {
-    "@elizaos/core": ">=0.1.0"
+    "@elizaos/core": ">=0.1.0",
+    "@yault/aesp": ">=0.1.0"
   },
   "devDependencies": {
     "@elizaos/core": "0.1.7",

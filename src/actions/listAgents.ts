@@ -5,7 +5,7 @@
  */
 
 import type { Action, IAgentRuntime, Memory, State, HandlerCallback } from '@elizaos/core';
-import { getEngine, getReviewManager, getConfig, getKnownAgents } from '../init.js';
+import { ensureAESPInitialized, getEngine, getReviewManager, getConfig, getKnownAgents } from '../init.js';
 import { requireAuthorizedOperator } from '../security.js';
 
 export const listAgentsAction: Action = {
@@ -41,6 +41,7 @@ export const listAgentsAction: Action = {
       if (!(await requireAuthorizedOperator(runtime, message, callback))) {
         return;
       }
+      await ensureAESPInitialized(runtime);
 
       const engine = getEngine(runtime);
       const reviewMgr = getReviewManager(runtime);

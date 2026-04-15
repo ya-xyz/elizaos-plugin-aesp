@@ -5,7 +5,7 @@
  */
 
 import type { Action, IAgentRuntime, Memory, State, HandlerCallback } from '@elizaos/core';
-import { getEngine, getConfig } from '../init.js';
+import { ensureAESPInitialized, getEngine, getConfig } from '../init.js';
 
 export const checkBudgetAction: Action = {
   name: 'AESP_CHECK_BUDGET',
@@ -37,6 +37,7 @@ export const checkBudgetAction: Action = {
     callback?: HandlerCallback,
   ): Promise<unknown> => {
     try {
+      await ensureAESPInitialized(runtime);
       const config = getConfig(runtime);
       const engine = getEngine(runtime);
       const budgetTracker = engine.getBudgetTracker();

@@ -1,8 +1,8 @@
 /**
- * @yallet/elizaos-plugin-aesp — Plugin-Specific Types
+ * @yault/elizaos-plugin-aesp — Plugin-Specific Types
  */
 
-import type { ChainId } from '@yallet/aesp';
+import type { ChainId } from '@yault/aesp';
 
 /** Plugin configuration from ElizaOS character settings */
 export interface AESPPluginConfig {

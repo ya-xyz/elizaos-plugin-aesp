@@ -5,9 +5,9 @@
  */
 
 import type { Action, IAgentRuntime, Memory, State, HandlerCallback } from '@elizaos/core';
-import { getNegotiationFSM, getConfig, trackKnownAgent, getReviewManager } from '../init.js';
+import { ensureAESPInitialized, getNegotiationFSM, getConfig, trackKnownAgent, getReviewManager } from '../init.js';
 import { requireAuthorizedOperator, guardFrozenAgent } from '../security.js';
-import type { NegotiationOffer, NegotiationCounterOffer, NegotiationAcceptance, NegotiationRejection } from '@yallet/aesp';
+import type { NegotiationOffer, NegotiationCounterOffer, NegotiationAcceptance, NegotiationRejection } from '@yault/aesp';
 
 export const negotiateAction: Action = {
   name: 'AESP_NEGOTIATE',
@@ -42,6 +42,7 @@ export const negotiateAction: Action = {
       if (!(await requireAuthorizedOperator(runtime, message, callback))) {
         return;
       }
+      await ensureAESPInitialized(runtime);
 
       const config = getConfig(runtime);
       const fsm = getNegotiationFSM(runtime);

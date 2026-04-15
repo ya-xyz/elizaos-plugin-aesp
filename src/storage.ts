@@ -1,11 +1,11 @@
 /**
- * @yallet/elizaos-plugin-aesp — Storage Adapter
+ * @yault/elizaos-plugin-aesp — Storage Adapter
  *
  * Bridges AESP's StorageAdapter interface to ElizaOS runtime cache.
  * Two-tier: in-memory Map (fast) + ElizaOS cacheManager (persistent).
  */
 
-import type { StorageAdapter } from '@yallet/aesp';
+import type { StorageAdapter } from '@yault/aesp';
 import type { IAgentRuntime } from '@elizaos/core';
 
 const KEY_INDEX_KEY = '__aesp_key_index__';
@@ -52,7 +52,7 @@ export class ElizaStorageAdapter implements StorageAdapter {
         return cached;
       }
     } catch (err) {
-      console.warn('[AESP storage] cacheManager.get failed:', key, err);
+      console.warn('[AESP storage] cacheManager.get failed for key:', key);
     }
     return null;
   }
@@ -63,8 +63,8 @@ export class ElizaStorageAdapter implements StorageAdapter {
     this.knownKeys.add(key);
     try {
       await this.runtime.cacheManager.set(key, value);
-    } catch (err) {
-      console.warn('[AESP storage] cacheManager.set failed:', key, err);
+    } catch {
+      console.warn('[AESP storage] cacheManager.set failed for key:', key);
     }
     if (isNew) await this.persistKeyIndex();
   }
@@ -74,8 +74,8 @@ export class ElizaStorageAdapter implements StorageAdapter {
     const existed = this.knownKeys.delete(key);
     try {
       await this.runtime.cacheManager.delete(key);
-    } catch (err) {
-      console.warn('[AESP storage] cacheManager.delete failed:', key, err);
+    } catch {
+      console.warn('[AESP storage] cacheManager.delete failed for key:', key);
     }
     if (existed) await this.persistKeyIndex();
   }

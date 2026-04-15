@@ -5,11 +5,12 @@
  */
 
 import type { Provider, IAgentRuntime, Memory, State } from '@elizaos/core';
-import { getEngine, getReviewManager, getConfig } from '../init.js';
+import { ensureAESPInitialized, getEngine, getReviewManager, getConfig } from '../init.js';
 
 export const policyProvider: Provider = {
   get: async (runtime: IAgentRuntime, _message: Memory, _state?: State): Promise<string> => {
     try {
+      await ensureAESPInitialized(runtime);
       const config = getConfig(runtime);
       const engine = getEngine(runtime);
       const reviewMgr = getReviewManager(runtime);

@@ -37,6 +37,7 @@ const mockReviewMgr = {
 
 vi.mock('../src/init.js', () => {
   return {
+    ensureAESPInitialized: vi.fn().mockResolvedValue(undefined),
     getEngine: () => ({
       getBudgetTracker: () => ({
         getBudget: vi.fn().mockReturnValue(mockBudget),

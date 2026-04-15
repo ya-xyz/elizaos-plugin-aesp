@@ -5,7 +5,7 @@
  */
 
 import type { Evaluator, IAgentRuntime, Memory, State } from '@elizaos/core';
-import { getEngine } from '../init.js';
+import { ensureAESPInitialized, getEngine } from '../init.js';
 
 export const auditEvaluator: Evaluator = {
   name: 'AESP_AUDIT',
@@ -43,6 +43,7 @@ export const auditEvaluator: Evaluator = {
     _state?: State,
   ): Promise<unknown> => {
     try {
+      await ensureAESPInitialized(runtime);
       const engine = getEngine(runtime);
 
       // Save current state to persist audit entries

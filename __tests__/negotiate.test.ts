@@ -47,6 +47,7 @@ vi.mock('../src/init.js', () => {
     getFreezeStatus: vi.fn().mockReturnValue(undefined),
   };
   return {
+    ensureAESPInitialized: vi.fn().mockResolvedValue(undefined),
     getNegotiationFSM: () => mockFSM,
     getReviewManager: () => mockReviewMgr,
     getConfig: () => ({

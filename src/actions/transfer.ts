@@ -6,10 +6,10 @@
  */
 
 import type { Action, IAgentRuntime, Memory, State, HandlerCallback } from '@elizaos/core';
-import { getEngine, getReviewManager, getConfig, trackKnownAgent } from '../init.js';
+import { ensureAESPInitialized, getEngine, getReviewManager, getConfig, trackKnownAgent } from '../init.js';
 import { requireAuthorizedOperator, guardFrozenAgent } from '../security.js';
-import { generateUUID } from '@yallet/aesp';
-import type { AgentExecutionRequest, TransferPayload } from '@yallet/aesp';
+import { generateUUID } from '@yault/aesp';
+import type { AgentExecutionRequest, TransferPayload } from '@yault/aesp';
 import type { TransferIntent } from '../types.js';
 
 function parseTransferIntent(text: string, defaultChain: string): TransferIntent | null {
@@ -22,7 +22,7 @@ function parseTransferIntent(text: string, defaultChain: string): TransferIntent
     amount: match[1],
     token: match[2].toLowerCase(),
     toAddress: match[3],
-    chainId: match[4]?.toLowerCase() ?? defaultChain,
+    chainId: (match[4] ?? defaultChain).toLowerCase(),
   };
 }
 
@@ -59,6 +59,7 @@ export const transferAction: Action = {
       if (!(await requireAuthorizedOperator(runtime, message, callback))) {
         return;
       }
+      await ensureAESPInitialized(runtime);
 
       const config = getConfig(runtime);
       const engine = getEngine(runtime);
@@ -94,9 +95,8 @@ export const transferAction: Action = {
 
       if (approvedPolicyId) {
         await engine.recordExecution(request.requestId, approvedPolicyId, {
-          success: false,
+          success: true,
           requestId: request.requestId,
-          error: 'policy_approved_pending_settlement',
           timestamp: Date.now(),
         }, request);
 

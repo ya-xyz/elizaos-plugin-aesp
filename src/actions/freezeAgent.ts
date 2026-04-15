@@ -5,8 +5,21 @@
  */
 
 import type { Action, IAgentRuntime, Memory, State, HandlerCallback } from '@elizaos/core';
-import { getReviewManager, getConfig, trackKnownAgent } from '../init.js';
+import { ensureAESPInitialized, getReviewManager, getConfig, trackKnownAgent } from '../init.js';
 import { requireAuthorizedOperator } from '../security.js';
+
+function parseTargetAgentId(text: string): string | null {
+  // Prefer explicit identifiers like "agent-bob" to avoid false captures
+  // from natural-language words (e.g. "freeze because ...").
+  const directMatch = text.match(/\b(agent[a-zA-Z0-9_-]{1,63})\b/i);
+  if (directMatch) return directMatch[1];
+
+  // Also support "agent bob" and normalize to "agent-bob".
+  const separatedMatch = text.match(/\bagent\s+([a-zA-Z0-9_-]{1,64})\b/i);
+  if (separatedMatch) return `agent-${separatedMatch[1]}`;
+
+  return null;
+}
 
 export const freezeAgentAction: Action = {
   name: 'AESP_FREEZE_AGENT',
@@ -41,13 +54,13 @@ export const freezeAgentAction: Action = {
       if (!(await requireAuthorizedOperator(runtime, message, callback))) {
         return;
       }
+      await ensureAESPInitialized(runtime);
 
       const reviewMgr = getReviewManager(runtime);
       const text = message.content.text ?? '';
 
       const isUnfreeze = /\bunfreeze\b/i.test(text);
-      const agentMatch = text.match(/(?:agent|freeze|unfreeze)\s+([a-zA-Z0-9_-]+)/i);
-      const agentId = agentMatch?.[1] ?? getConfig(runtime).agentId;
+      const agentId = parseTargetAgentId(text) ?? getConfig(runtime).agentId;
       trackKnownAgent(runtime, agentId);
 
       if (isUnfreeze) {

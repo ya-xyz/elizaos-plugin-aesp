@@ -40,6 +40,7 @@ vi.mock('../src/init.js', () => {
     getPoliciesForAgent: vi.fn().mockReturnValue([mockPolicy]),
   };
   return {
+    ensureAESPInitialized: vi.fn().mockResolvedValue(undefined),
     getEngine: () => mockEngine,
     getConfig: () => ({
       ownerXidentity: 'test-xidentity',

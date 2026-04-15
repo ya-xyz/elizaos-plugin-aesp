@@ -16,6 +16,7 @@ vi.mock('../src/init.js', () => {
   };
 
   return {
+    ensureAESPInitialized: vi.fn().mockResolvedValue(undefined),
     getEngine: () => mockEngine,
     getReviewManager: () => mockReviewMgr,
     getConfig: () => ({

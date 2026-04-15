@@ -1,5 +1,5 @@
 /**
- * @yallet/elizaos-plugin-aesp
+ * @yault/elizaos-plugin-aesp
  *
  * Policy-gated agent economics for ElizaOS.
  * Wraps AESP (Agent Economic Sovereignty Protocol) into the ElizaOS plugin interface.

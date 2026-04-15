@@ -7,6 +7,7 @@ const mockEngine = {
 };
 
 vi.mock('../src/init.js', () => ({
+  ensureAESPInitialized: vi.fn().mockResolvedValue(undefined),
   getEngine: () => mockEngine,
 }));
 

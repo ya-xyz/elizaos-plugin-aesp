@@ -10,6 +10,7 @@ vi.mock('../src/init.js', () => {
     getFreezeStatus: vi.fn().mockReturnValue(undefined),
   };
   return {
+    ensureAESPInitialized: vi.fn().mockResolvedValue(undefined),
     getReviewManager: () => mockReviewMgr,
     getConfig: () => ({
       ownerXidentity: 'test-xidentity',
@@ -114,6 +115,23 @@ describe('AESP_FREEZE_AGENT', () => {
       );
 
       // "emergency stop" doesn't match the agentMatch regex, so defaults to config.agentId
+      expect(mockReviewMgr.freezeAgent).toHaveBeenCalledWith(expect.objectContaining({
+        agentId: 'my-agent',
+      }));
+    });
+
+    it('should not parse filler words as target agent', async () => {
+      const { __mockReviewMgr: mockReviewMgr } = await import('../src/init.js') as any;
+      const callback = vi.fn();
+
+      await freezeAgentAction.handler(
+        mockRuntime,
+        createMessage('Freeze because suspicious activity'),
+        undefined,
+        undefined,
+        callback,
+      );
+
       expect(mockReviewMgr.freezeAgent).toHaveBeenCalledWith(expect.objectContaining({
         agentId: 'my-agent',
       }));

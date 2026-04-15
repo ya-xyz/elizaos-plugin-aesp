@@ -4,6 +4,7 @@ import type { Memory, IAgentRuntime, State } from '@elizaos/core';
 
 // Mock the init module
 vi.mock('../src/init.js', () => {
+  let mockDefaultChain = 'ethereum';
   const mockEngine = {
     checkAutoApprove: vi.fn(),
     recordExecution: vi.fn(),
@@ -16,14 +17,18 @@ vi.mock('../src/init.js', () => {
     getFreezeStatus: vi.fn().mockReturnValue(undefined),
   };
   return {
+    ensureAESPInitialized: vi.fn().mockResolvedValue(undefined),
     getEngine: () => mockEngine,
     getReviewManager: () => mockReviewMgr,
     getConfig: () => ({
       ownerXidentity: 'test-xidentity',
       agentId: 'test-agent',
-      defaultChain: 'ethereum',
+      defaultChain: mockDefaultChain,
     }),
     trackKnownAgent: vi.fn(),
+    __setDefaultChain: (chain: string) => {
+      mockDefaultChain = chain;
+    },
     __mockEngine: mockEngine,
     __mockReviewMgr: mockReviewMgr,
   };
@@ -44,8 +49,10 @@ const mockRuntime = {
 } as unknown as IAgentRuntime;
 
 describe('AESP_TRANSFER', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    const { __setDefaultChain } = await import('../src/init.js') as any;
+    __setDefaultChain('ethereum');
     (mockRuntime.getSetting as any).mockImplementation((key: string) => {
       if (key === 'AESP_OWNER_USER_ID') return '00000000-0000-0000-0000-000000000001';
       return undefined;
@@ -83,7 +90,7 @@ describe('AESP_TRANSFER', () => {
       expect(mockEngine.recordExecution).toHaveBeenCalledWith(
         expect.any(String),
         'policy-123',
-        expect.objectContaining({ error: 'policy_approved_pending_settlement' }),
+        expect.objectContaining({ success: true }),
         expect.any(Object),
       );
       expect(callback).toHaveBeenCalledWith(expect.objectContaining({
@@ -108,6 +115,24 @@ describe('AESP_TRANSFER', () => {
       expect(callback).toHaveBeenCalledWith(expect.objectContaining({
         text: expect.stringContaining('requires human approval'),
       }));
+    });
+
+    it('should normalize configured default chain when omitted in message', async () => {
+      const { __mockEngine: mockEngine, __setDefaultChain } = await import('../src/init.js') as any;
+      __setDefaultChain('Ethereum');
+      mockEngine.checkAutoApprove.mockResolvedValue('policy-123');
+
+      const callback = vi.fn();
+      await transferAction.handler(
+        mockRuntime,
+        createMessage('Send 100 USDC to 0x1234567890abcdef1234567890abcdef12345678'),
+        undefined,
+        undefined,
+        callback,
+      );
+
+      const call = mockEngine.checkAutoApprove.mock.calls[0]?.[0];
+      expect(call?.action?.payload?.chainId).toBe('ethereum');
     });
 
     it('should handle unparseable messages', async () => {
